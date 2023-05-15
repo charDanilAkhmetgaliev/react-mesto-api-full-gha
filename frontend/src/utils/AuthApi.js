@@ -1,5 +1,9 @@
 import { authUrl } from './constants.js';
 
+const AUTH_HEADERS = {
+  'Content-Type': 'application/json'
+}
+
 const processResponse = (response, error) => {
 	if (response.status === 200 || response.status === 201) {
 		return response.json();
@@ -9,36 +13,42 @@ const processResponse = (response, error) => {
 	}
 };
 
-const requestConstructor = (formValue, method, endPoint, error, headers) => {
-	return fetch(`${authUrl}/${endPoint}`, {
-		method: method,
-		headers: headers,
-		body: JSON.stringify(formValue)
-	}).then(response => processResponse(response, error));
-};
+const requestConstructor = (endpoint, requestOptions, error) => {
+  return fetch(`${authUrl}/${endpoint}`, requestOptions)
+    .then(response => processResponse(response, error))
+}
 
 const registerUser = formValue => {
-	return requestConstructor(formValue, 'POST', 'signup', 'Ошибка регистрации', {
-		'Content-Type': 'application/json'
-	});
-};
+  return requestConstructor('signup', {
+    method: 'POST',
+    headers: AUTH_HEADERS,
+    body: JSON.stringify(formValue),
+    credentials: 'include'
+  }, 'Ошибка регистрации')
+}
 
 const loginUser = formValue => {
-	return requestConstructor(formValue, 'POST', 'signin', 'Ошибка авторизации', {
-		'Content-Type': 'application/json'
-	});
-};
+  return requestConstructor('signin', {
+    method: 'POST',
+    headers: AUTH_HEADERS,
+    body: JSON.stringify(formValue),
+    credentials: 'include'
+  }, 'Ошибка авторизации')
+}
 
-const getContent = jwt => {
-	return fetch(`${authUrl}/users/me`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${jwt}`
-		}
-	})
-		.then(response => processResponse(response, 'Ошибка получения данных'))
-		.then(data => data);
-};
+const logout = () => {
+  return requestConstructor('logout', {
+    method: 'GET',
+    credentials: 'include'
+  }, 'Ошибка выхода из системы')
+}
 
-export { registerUser, loginUser, getContent };
+const getContent = () => {
+  return requestConstructor('users/me', {
+    method: 'GET',
+    headers: AUTH_HEADERS,
+    credentials: 'include'
+  }, 'Ошибка получения данных')
+}
+
+export { registerUser, loginUser, getContent, logout };

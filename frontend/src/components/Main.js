@@ -1,8 +1,8 @@
-import { useContext, memo } from "react";
+import { useContext } from "react";
 import Card from './Card.js';
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
-export default memo(function Main({ onEditAvatar, onEditProfile, onAddPlac, onCardClick, onCardLike, cards, onCardDelete }) {
+export default function Main({ onEditAvatar, onEditProfile, onAddPlac, onCardClick, onCardLike, cards, onCardDelete }) {
   const { name, about, avatar } = useContext(CurrentUserContext);
 
   return (
@@ -40,4 +40,4 @@ export default memo(function Main({ onEditAvatar, onEditProfile, onAddPlac, onCa
       </section>
     </main>
   )
-})
+}

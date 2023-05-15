@@ -62,7 +62,7 @@ module.exports.login = async (req, res, next) => {
     // todo добавить jwt из окружения process.env.JWT_SECRET
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '1w' });
 
-    res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
+    res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true, sameSite: 'none', secure: true })
       .send({
         _id: user._id,
         name: user.name,
@@ -74,6 +74,16 @@ module.exports.login = async (req, res, next) => {
     next(err);
   }
 };
+
+module.exports.logout = (req, res, next) => {
+  try{
+    res.cookie('jwt', '', { expires: new Date(0), httpOnly: true, sameSite: 'none', secure: true })
+      .send({ message: 'jwt удален успешно' });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // get user data controller
 module.exports.getUserData = (req, res, next) => {
   User.findById(req.user._id)

@@ -26,7 +26,7 @@ export default function Card({ onCardDelete, onCardClick, onCardLike, owner, lik
           <p className="card__likes-count">{likes.length}</p>
         </div>
       </div>
-      {isOwn && (<button className='card__delete-button card__delete-button_active' onClick={handleCardDelete}></button>)}
+      <button className={`card__delete-button ${!isOwn && 'card__delete-button_disable'}`} onClick={handleCardDelete}></button>
     </li>
   )
 }

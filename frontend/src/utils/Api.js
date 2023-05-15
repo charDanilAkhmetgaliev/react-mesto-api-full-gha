@@ -1,9 +1,7 @@
-import { url, userAuthData } from './constants';
+import { url } from './constants';
 class Api {
-  constructor(url, { userToken, cohortName }) {
+  constructor(url) {
     this._url = url;
-    this._userToken = userToken;
-    this._cohort = cohortName;
   }
 
   _processResponse(response, error) {
@@ -13,63 +11,81 @@ class Api {
     return Promise.reject(error);
   }
 
-  _createSimpleRequest(extensionUrl, requestMethod, errorText) {
-    this._completeUrl = `${this._url}/${this._cohort}`.concat(extensionUrl);
-    return fetch(this._completeUrl, {
-      method: requestMethod,
-      headers: {
-        'authorization': `${this._userToken}`
-      }
-    })
-    .then(response => this._processResponse(response, errorText))
-  }
-
-  _createBodyRequest(extensionUrl, requestMethod, errorText, bodyData) {
-    this._completeUrl = `${this._url}/${this._cohort}`.concat(extensionUrl);
-    return fetch(this._completeUrl, {
-      method: requestMethod,
-      headers: {
-        'authorization': `${this._userToken}`,
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify(bodyData)
-    })
-    .then(response => this._processResponse(response, errorText))
+  _createRequest(endpointUrl, requestOptions, error) {
+    return fetch(`${this._url}/${endpointUrl}`, requestOptions)
+      .then(response => this._processResponse(response, error))
   }
 
   getUserInfo() {
-    return this._createSimpleRequest('/users/me', 'GET', 'Ошибка авторизации')
+    return this._createRequest('users/me', {
+      method: 'GET',
+      credentials: 'include'
+    }, 'Ошибка авторизации')
   }
 
   getCardsData() {
-    return this._createSimpleRequest('/cards', 'GET', 'Ошибка обновления карточек')
+    return this._createRequest('cards', {
+      method: 'GET',
+      credentials: 'include'
+    }, 'Ошибка обновления карточек')
   }
 
   deleteCardData(cardId) {
-    return this._createSimpleRequest(`/cards/${cardId}`, 'DELETE', 'Ошибка удаления карточки')
+    return this._createRequest(`cards/${cardId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    }, 'Ошибка удаления карточки')
   }
 
   updateAvatarData(formData) {
-    return this._createBodyRequest('/users/me/avatar', 'PATCH', 'Ошибка обновления аватара', formData)
+    return this._createRequest('users/me/avatar', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData),
+      credentials: 'include'
+    }, 'Ошибка обновления аватара')
   }
 
   sendCardData(formData) {
-    return this._createBodyRequest('/cards', 'POST', 'Ошибка добавления карточки', formData)
+    return this._createRequest('cards', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData),
+      credentials: 'include'
+    }, 'Ошибка добавления карточки')
   }
 
   updateProfileData(formData) {
-    return this._createBodyRequest('/users/me', 'PATCH', 'Ошибка обновления профиля', formData)
+    return this._createRequest('users/me', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData),
+      credentials: 'include'
+    }, 'Ошибка обновления профиля')
   }
 
   changeLikeCardStatus(cardId, isNotLiked) {
     if (isNotLiked) {
-      return this._createSimpleRequest(`/cards/${cardId}/likes`, 'PUT', 'Ошибка добавления лайка')
+      return this._createRequest(`cards/${cardId}/likes`, {
+        method: 'PUT',
+        credentials: 'include'
+      }, 'Ошибка добавления лайка')
+    } else {
+      return this._createRequest(`cards/${cardId}/likes`, {
+        method: 'DELETE',
+        credentials: 'include'
+      }, 'Ошибка удаления лайка')
     }
-    return this._createSimpleRequest(`/cards/${cardId}/likes`, 'DELETE', 'Ошибка удаления лайка')
   }
 }
 
-const api = new Api(url, userAuthData);
+const api = new Api(url);
 
 export {api};
 

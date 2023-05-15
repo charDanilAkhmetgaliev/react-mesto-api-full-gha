@@ -8,8 +8,9 @@ const cookieParser = require('cookie-parser');
 const limiter = require('./midlewares/limiter');
 const auth = require('./midlewares/auth');
 const { errorLogger, requestLogger } = require('./midlewares/logger');
+const corsVerification = require('./midlewares/cors');
 // controllers imports
-const { login, createUser } = require('./controllers/users');
+const { login, createUser, logout } = require('./controllers/users');
 const { handlerError } = require('./scripts/utils/errors');
 // errors
 const ObjectNotFoundError = require('./scripts/components/errors/ObjectNotFoundError');
@@ -26,7 +27,8 @@ const { PORT = 3000 } = process.env;
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 // protect and parse
-app.use(limiter);
+// todo включить limiter
+// app.use(limiter);
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -35,12 +37,15 @@ app.use(cookieParser(JWT_SECRET));
 // logger req
 app.use(requestLogger);
 
-// authentication
+// CORS protect
+app.use(corsVerification);
+
+// authentication rout
 app.post('/signin', celebrate({
   body: schemaBodySignIn,
 }), login);
 
-// register
+// register rout
 app.post('/signup', celebrate({
   body: schemaBodySignUp,
 }), createUser);
@@ -48,6 +53,8 @@ app.post('/signup', celebrate({
 // authorization
 app.use(auth);
 
+// logout
+app.get('/logout', logout);
 // routing
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));

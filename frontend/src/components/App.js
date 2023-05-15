@@ -14,7 +14,7 @@ import PopupWithForm from './PopupWithForm.js';
 import Login from './Login.js';
 import Register from './Register.js';
 import ProtectedRoute from './ProtectedRoute.js';
-import { getContent } from '../utils/AuthApi.js';
+import { getContent, logout } from '../utils/AuthApi.js';
 import { AppContext } from '../contexts/AppContext.js';
 import InfoTooltip from './InfoTooltip.js';
 
@@ -108,7 +108,7 @@ export default function App() {
 			})
 			.catch(err => console.log(err));
 	}
-	// обработчик клика удаления лайка
+	// обработчик клика удаления карточки
 	function handleCardDelete() {
 		return api.deleteCardData(deletedCardId).then(() => {
 			setCards(currentCards =>
@@ -135,34 +135,30 @@ export default function App() {
 		});
 	}
 
-	const getUserAuthData = jwt => {
-		return getContent(jwt.token).then(res => {
-			setLoggedIn(true);
-			const userData = {
-				_id: res.data._id,
-				email: res.data.email
-			};
-			setUserData(userData);
-		});
-	};
-
-	const tokenCheck = () => {
-		if (localStorage.getItem('jwt')) {
-			const jwt = JSON.parse(localStorage.getItem('jwt'));
-			if (jwt) {
-				getUserAuthData(jwt)
-					.then(() => {
-						navigate('/', { replace: true });
-					})
-			}
-		} else {
-			navigate('sign-in', { replace: true });
-		}
-	};
-
 	useEffect(() => {
+    const getUserAuthData = () => {
+      return getContent().then(res => {
+        setLoggedIn(true);
+        const userData = {
+          _id: res._id,
+          email: res.email
+        };
+        setUserData(userData);
+      });
+    };
+    const tokenCheck = () => {
+      try {
+        getUserAuthData()
+        .then(() => {
+          navigate('/', { replace: true });
+        })
+      } catch (err) {
+        navigate('sign-in', { replace: true });
+      }
+    };
+
 		tokenCheck();
-	}, [loggedIn]);
+	}, []);
 
 	// хук для реализации закрытия попапов на Escape
 	useEffect(() => {
@@ -191,10 +187,12 @@ export default function App() {
 		api
 			.getCardsData()
 			.then(cardsData => {
+        cardsData.reverse();
 				setCards(cardsData);
 			})
 			.catch(err => console.log(err));
-	}, []);
+
+	}, [loggedIn]);
 	// обработчик валидации форм
 	function handleValidation({ inputElement, spanElement }) {
 		if (!inputElement.validity.valid) {
@@ -211,13 +209,15 @@ export default function App() {
 	}
 
 	const signOut = () => {
-		localStorage.removeItem('jwt');
-		setLoggedIn(false);
-		setUserData({
-			_id: '',
-			email: ''
-		});
-		navigate('/sign-in', { replace: true });
+    logout().then((message) => {
+      console.log(message)
+      setLoggedIn(false);
+      setUserData({
+        _id: '',
+        email: ''
+      });
+      navigate('/sign-in', { replace: true });
+    })
 	};
 
 	return (
@@ -225,7 +225,7 @@ export default function App() {
 			<Header userData={userData} signOut={signOut} />
 			<CurrentUserContext.Provider value={currentUser}>
 				<ValidationContext.Provider value={isValid}>
-					<AppContext.Provider value={{ loggedIn: loggedIn, handleLogin: handleLogin }}>
+					<AppContext.Provider value={{ loggedIn: loggedIn, onLogin: handleLogin }}>
 						<Routes>
 							<Route path='/' element={
 									<ProtectedRoute

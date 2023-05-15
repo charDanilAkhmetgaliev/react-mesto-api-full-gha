@@ -1,5 +1,5 @@
 import PopupWithForm from "./PopupWithForm";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {useForm} from "../hooks/useForm";
 
 export default function AddPlacePopup({ isOpen, onClose, onOutPopupClick, onAddPlace, onValidation }) {
@@ -23,7 +23,7 @@ export default function AddPlacePopup({ isOpen, onClose, onOutPopupClick, onAddP
   }
 
   useEffect(() => {
-    setValues({name: '', values: ''});
+    setValues({name: '', link: ''});
     nameSpanRef.current.textContent = '';
     linkSpanRef.current.textContent = '';
     nameInputRef.current.classList.remove('popup__input_error');
