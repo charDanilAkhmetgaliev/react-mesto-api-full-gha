@@ -38,7 +38,7 @@ app.use(cookieParser(JWT_SECRET));
 app.use(requestLogger);
 
 // CORS protect
-// app.use(corsVerification);
+app.use(corsVerification);
 
 // authentication rout
 app.post('/signin', celebrate({
