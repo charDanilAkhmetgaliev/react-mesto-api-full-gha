@@ -138,28 +138,47 @@ export default function App() {
 	useEffect(() => {
     const getUserAuthData = () => {
       return getContent().then(res => {
-        setLoggedIn(true);
-        const userData = {
-          _id: res._id,
-          email: res.email
-        };
-        setUserData(userData);
+        if (res) {
+          setLoggedIn(true);
+        } else {
+          console.log('Ошибка авторизации')
+        }
       });
     };
     const tokenCheck = () => {
-      try {
-        getUserAuthData()
+      getUserAuthData()
         .then(() => {
           navigate('/', { replace: true });
         })
-      } catch (err) {
-        navigate('sign-in', { replace: true });
-      }
+        .catch(() => {
+          navigate('sign-in', { replace: true });
+        })
     };
 
 		tokenCheck();
 	}, []);
+  // хук для получения исходных данных с сервера
+  useEffect(() => {
+    api
+    .getUserInfo()
+    .then(userData => {
+      setCurrentUser(userData);
+      setUserData({
+        _id: userData._id,
+        email: userData.email
+      })
+    })
+    .catch(err => console.log(err));
 
+    api
+    .getCardsData()
+    .then(cardsData => {
+      cardsData.reverse();
+      setCards(cardsData);
+    })
+    .catch(err => console.log(err));
+
+  }, [loggedIn]);
 	// хук для реализации закрытия попапов на Escape
 	useEffect(() => {
 		function closeByEscape(e) {
@@ -175,24 +194,7 @@ export default function App() {
 			};
 		}
 	}, [isOpen, tooltipIsOpen]);
-	// хук для получения исходных данных с сервера
-	useEffect(() => {
-		api
-			.getUserInfo()
-			.then(userData => {
-				setCurrentUser(userData);
-			})
-			.catch(err => console.log(err));
 
-		api
-			.getCardsData()
-			.then(cardsData => {
-        cardsData.reverse();
-				setCards(cardsData);
-			})
-			.catch(err => console.log(err));
-
-	}, [loggedIn]);
 	// обработчик валидации форм
 	function handleValidation({ inputElement, spanElement }) {
 		if (!inputElement.validity.valid) {
