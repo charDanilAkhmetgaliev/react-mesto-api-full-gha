@@ -8,6 +8,7 @@ const REG_EXP_LINK = /^https?:\/\/(www.)?[\w-]+\.[a-z]{2,}[\w\-.~:/?#@!$&'()*+,;
 const REG_EXP_JWT = /^jwt=[\w\-.~+/\\]+$/;
 // CORS
 const ALLOWED_CORS = [
+  'http://localhost:3000',
   'http://localhost:3001',
   'http://mesto-online.nomoredomains.monster',
   'https://mesto-online.nomoredomains.monster'
