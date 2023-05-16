@@ -24,15 +24,8 @@ const app = express();
 const { PORT = 3000 } = process.env;
 
 // mongoDB server connecting
-try {
-  mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
-} catch (err) {
-  const error = new Error();
-  error.name = 'ERROR_BD';
-  error.statusCode = 503;
-  error.message = 'База данных не доступна';
-  next(error);
-}
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+
 
 
 
