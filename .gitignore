@@ -1,6 +1,6 @@
 # dev
-/frontend/src
-/frontend/public
+/frontend/src/
+/frontend/public/
 
 # config
 .idea
