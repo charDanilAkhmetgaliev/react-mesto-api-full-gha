@@ -1,8 +1,6 @@
 // packages imports
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-// utils imports
-const { handlerValidation } = require('../scripts/utils/validator');
 // errors classes imports
 const ObjectNotFoundError = require('../scripts/components/errors/ObjectNotFoundError');
 
@@ -27,8 +25,6 @@ module.exports.getUsersById = (req, res, next) => {
 // create/register user controller
 module.exports.createUser = async (req, res, next) => {
   try {
-    handlerValidation(req, res);
-
     const newUser = await User.createUserByCredentials(req.body);
 
     res.send(newUser);
@@ -54,7 +50,6 @@ module.exports.updateAvatar = (req, res, next) => {
 // login user controller
 module.exports.login = async (req, res, next) => {
   try {
-    handlerValidation(req, res);
 
     const { email, password } = req.body;
 

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const ValidationError = require('../scripts/components/errors/ValidationError');
+const AuthorizationError = require('../scripts/components/errors/AuthorizationError');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -41,10 +41,10 @@ userSchema.statics.findUserByCredentials = function findUser(email, password) {
             if (matched) {
               return user;
             }
-            throw new ValidationError('Логин или пароль не верный');
+            throw new AuthorizationError('Логин или пароль не верный');
           });
       }
-      throw new ValidationError('Логин или пароль не верный');
+      throw new AuthorizationError('Логин или пароль не верный');
     });
 };
 
