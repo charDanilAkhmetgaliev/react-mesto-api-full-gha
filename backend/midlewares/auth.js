@@ -6,8 +6,6 @@ module.exports = (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (token) {
-    // todo взять из окружения
-    // const { JWT_SECRET } = process.env;
     let payload;
 
     try {

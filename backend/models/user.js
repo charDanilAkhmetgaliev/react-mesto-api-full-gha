@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const ValidationError = require('../scripts/components/errors/ValidationError');
-const { SALT_ROUNDS } = require('../scripts/utils/constants');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -52,8 +51,7 @@ userSchema.statics.findUserByCredentials = function findUser(email, password) {
 userSchema.statics.createUserByCredentials = function createUser({
   name, about, avatar, email, password,
 }) {
-  // todo взять salt из окружения
-  return bcrypt.hash(password, SALT_ROUNDS)
+  return bcrypt.hash(password, 10)
     .then((hash) => this.create({
       name,
       about,

@@ -5,6 +5,7 @@ const User = require('../models/user');
 const { handlerValidation } = require('../scripts/utils/validator');
 // errors classes imports
 const ObjectNotFoundError = require('../scripts/components/errors/ObjectNotFoundError');
+
 const { JWT_SECRET } = require('../scripts/utils/constants');
 
 // get all users controller
@@ -59,7 +60,6 @@ module.exports.login = async (req, res, next) => {
 
     const user = await User.findUserByCredentials(email, password);
 
-    // todo добавить jwt из окружения process.env.JWT_SECRET
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '1w' });
 
     res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
@@ -76,13 +76,15 @@ module.exports.login = async (req, res, next) => {
 };
 
 module.exports.logout = (req, res, next) => {
-  try{
-    res.cookie('jwt', '', { expires: new Date(0), httpOnly: true, sameSite: 'none', secure: true })
+  try {
+    res.cookie('jwt', '', {
+      expires: new Date(0), httpOnly: true, sameSite: 'none', secure: true,
+    })
       .send({ message: 'jwt удален успешно' });
   } catch (err) {
     next(err);
   }
-}
+};
 
 // get user data controller
 module.exports.getUserData = (req, res, next) => {
