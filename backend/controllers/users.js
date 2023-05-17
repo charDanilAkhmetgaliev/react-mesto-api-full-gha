@@ -50,7 +50,6 @@ module.exports.updateAvatar = (req, res, next) => {
 // login user controller
 module.exports.login = async (req, res, next) => {
   try {
-
     const { email, password } = req.body;
 
     const user = await User.findUserByCredentials(email, password);
