@@ -1,24 +1,24 @@
-const router = require('express').Router();
+const usersRouter = require('express').Router();
 const { celebrate } = require('celebrate');
 const { schemaBodyUser, schemaBodyAvatar, schemaParamUserId } = require('../scripts/utils/clbSchemas');
 const {
   getUsers, updateData, updateAvatar, getUserData, getUsersById,
 } = require('../controllers/users');
 
-router.get('/', getUsers);
+usersRouter.get('/', getUsers);
 
-router.get('/me', getUserData);
+usersRouter.get('/me', getUserData);
 
-router.patch('/me', celebrate({
+usersRouter.patch('/me', celebrate({
   body: schemaBodyUser,
 }), updateData);
 
-router.patch('/me/avatar', celebrate({
+usersRouter.patch('/me/avatar', celebrate({
   body: schemaBodyAvatar,
 }), updateAvatar);
 
-router.get('/:id', celebrate({
+usersRouter.get('/:id', celebrate({
   params: schemaParamUserId,
 }), getUsersById);
 
-module.exports = router;
+module.exports = usersRouter;
